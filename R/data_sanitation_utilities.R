@@ -69,7 +69,7 @@ datasanitation_hypothesistest_chisq<-function(data,dependent.var,independent.var
   }
 
 
-datasanitation_hypothesistest_chisq_sm<-function(data,dependent.var,independent.var){
+datasanitation_hypothesistest_chisq_sm<-function(data,dependent.var,dependent.var.cols, independent.var){
   # apply an exquisite selection of sanitations functions relevant to chisquare hypothesis tests:
 
 
@@ -79,6 +79,7 @@ datasanitation_hypothesistest_chisq_sm<-function(data,dependent.var,independent.
                          datasanitation_morethan_1_unique_dependent,
                          datasanitation_morethan_1_unique_independent,
                          datasanitation_independent_max_unique,
+                         datasantiation_sm_matches_choices,
                          datasanitation_dependent_max_unique,
                          datasanitation_morethan_1_record_per_independent_value
 
@@ -110,8 +111,8 @@ datasanitation_hypothesistest_limit<-function(data,dependent.var,independent.var
   apply_data_sanitations(data,           # all functions take these parameters
                          dependent.var,  # all functions take these parameters
                          independent.var,# all functions take these parameters
-                         datasanitation_morethan_1_unique_dependent,
-                         datasanitation_dependent_numeric
+                         datasanitation_dependent_numeric,
+                         datasanitation_morethan_1_unique_dependent
   )
 }
 

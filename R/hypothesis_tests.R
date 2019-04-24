@@ -113,6 +113,9 @@ hypothesis_test_t_one_sample <- function(dependent.var,
   sanitised<-datasanitation_design(design,dependent.var,independent.var,
                                    datasanitation_hypothesistest_limit)
 
+  if(!sanitised$success){return(hypothesis_test_empty(dependent.var,independent.var,message=sanitised$message))}
+  design<-sanitised$design
+
       formula_string<-paste0(dependent.var, "~", 0)
       ttest <- svyttest(formula(formula_string), design, na.rm = TRUE, alternative = "greater")
       results<-list()
@@ -187,6 +190,7 @@ hypothesis_test_z <- function(dependent.var,
 #'
 #' @param dependent.var string with the column name in `data` of the dependent variable. Should be a 'select multiple'.
 #' @param independen.var string with the column name in `data` of the independent variable. Should be a 'select one' with few (<15) categories.
+#' @param dependent.var.sm.cols the column indices for the T/F columns of each select multiple choice.
 #' @param design the svy design object created using map_to_design or directly with svydesign
 #' @return A list with the results of the test (Chi Squared statistics, p value) or the error message.
 #' @example hypothesis_test_chisquared_select_one("population_group", "resp_gender", design)
@@ -197,6 +201,10 @@ hypothesis_test_chisquared_select_multiple <- function(dependent.var,
                                                        design){
 
   # sanitise design
+  if(exists("questionnaire")){
+  matches <- all(questionnaire$choices_for_select_multiple(dependent.var, data) == dependent.var.cols)
+  if(!matches){warning("the name of your dependent variable does not match (all) the select multiple columns provided. Using the column indices to calculate results")}}
+
   for(x in dependent.var.sm.cols){
   dependent.var <- names(design$variables)[x]
   sanitised<-datasanitation_design(design,dependent.var,independent.var,

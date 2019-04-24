@@ -5,31 +5,33 @@ example<-load.example("example1",F)
 data <- example$data
 tf <- example$tf
 design <- svydesign(~0, data = data)
+questionnaire <- example$questionnaire
 
-test_that("var_more_than_n returns FALSE unless the dependent variable has two categories",{
-  expect_equal(var_more_than_n(c(NULL,7,7,7), 1),FALSE)
-  expect_equal(var_more_than_n(c(NA, 7,7,7), 1),FALSE)
-  expect_equal(var_more_than_n(c("d", 7,7,7), 1),TRUE)
-  expect_equal(var_more_than_n(c("d", "D"), 1),TRUE) #do we want it to be case sensitive? ideally throw a warning
-  expect_equal(var_more_than_n(c("d", "d"), 1),FALSE)
-  expect_equal(var_more_than_n(c(NA,NULL), 1),FALSE)
-  expect_equal(var_more_than_n(c(7," "), 1),FALSE)
-  expect_equal(var_more_than_n(c("  "," "), 1),FALSE)
-  expect_equal(var_more_than_n(c(list(), "d"), 1),FALSE)
-  # expect_equal(1,2)
-  # expect_equal(reduce_single_item_lists(1),1)
-  # expect_equal(reduce_single_item_lists("A"),"A")
-  # expect_equal(reduce_single_item_lists(list()),list())
-  # expect_equal(reduce_single_item_lists(list(1,2,list(1,2))),list(1,2,list(1,2)))
-  # expect_equal(1,2)
-})
+# test_that("var_more_than_n returns FALSE unless the dependent variable has two categories",{
+#   expect_equal(var_more_than_n(c(NULL,7,7,7), 1),FALSE)
+#   expect_equal(var_more_than_n(c(NA, 7,7,7), 1),FALSE)
+#   expect_equal(var_more_than_n(c("d", 7,7,7), 1),TRUE)
+#   expect_equal(var_more_than_n(c("d", "D"), 1),TRUE) #do we want it to be case sensitive? ideally throw a warning
+#   expect_equal(var_more_than_n(c("d", "d"), 1),FALSE)
+#   expect_equal(var_more_than_n(c(NA,NULL), 1),FALSE)
+#   expect_equal(var_more_than_n(c(7," "), 1),FALSE)
+#   expect_equal(var_more_than_n(c("  "," "), 1),FALSE)
+#   expect_equal(var_more_than_n(c(list(), "d"), 1),FALSE)
+#   # expect_equal(1,2)
+#   # expect_equal(reduce_single_item_lists(1),1)
+#   # expect_equal(reduce_single_item_lists("A"),"A")
+#   # expect_equal(reduce_single_item_lists(list()),list())
+#   # expect_equal(reduce_single_item_lists(list(1,2,list(1,2))),list(1,2,list(1,2)))
+#   # expect_equal(1,2)
+# })
 
 
 test_that("percent_with_confints_select_one outputs correct",{
   ###This needs to be tested with a dependent var thats select one, one that's select multiple, one that's numeric etc
   expect_is(percent_with_confints_select_one(tf$select_one[1], design = design), "data.frame")
   #expect_error(percent_with_confints_select_one(tf$numeric[1], design = design)) #numerical var, shouldnt throw error
-  expect_error(percent_with_confints_select_one(tf$fake[1], design = design)) #nonexistent.var
+  expect_warning(percent_with_confints_select_one(tf$fake[1], design = design)) #nonexistent.var
+  expect_warning(percent_with_confints_select_one(tf$fake[1], design = design))
   expect_warning(percent_with_confints_select_one(tf$select_multiple[1], design = design)) # select multiple
   expect_match(names(percent_with_confints_select_one(tf$select_one[1], design = design)), "min",all = FALSE)
   expect_match(names(percent_with_confints_select_one(tf$select_one[1], design = design)), "max",all = FALSE)

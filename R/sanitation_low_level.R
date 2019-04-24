@@ -77,6 +77,7 @@ data_sanitation_remove_not_in_samplingframe<-function(data,samplingframe_object,
 #   return(successfull_sanitation(data))
 # }
 
+
 datasanitation_morethan_1_unique_dependent<-function(data,dependent.var,independent.var){
   dependent_more_than_1 <- length(unique(data[[dependent.var]])) > 1
   if(!dependent_more_than_1){return(failed_sanitation("less than two unique values in the dependent variable"))}
@@ -152,7 +153,7 @@ as.numeric_factors_from_names<-function(x){
 }
 
 datasanitation_question_not_sm <- function(data,dependent.var,independent.var,...){
-  if(is.null(questionnaire)) {
+  if(!exists("questionnaire")) {
   dependent_is_select_multiple <- FALSE}else{
     dependent_is_select_multiple <- questionnaire$question_is_select_multiple(dependent.var)}
 if(dependent_is_select_multiple){return(failed_sanitation("Question is a select multiple. Please use percent_with_confints_select_multiple instead"))}
