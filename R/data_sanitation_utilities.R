@@ -251,16 +251,12 @@ datasanitation_find_missing <- function (data, dependent.var, independent.var, .
   problem_index <- blank_indices + na_indices_2 + na_indices_3
   na_indices[na_indices == FALSE] <- problem_index[na_indices == FALSE]
   if(!is.null(independent.var)){
-    which_independent_one_record <- table(data[[independent.var]])
-    which_independent_one_record <- which_independent_one_record[which(which_independent_one_record ==1)]
-    which_independent_one_record <- names(which_independent_one_record)
-    which_independent_one_record <- (data[[independent.var]]==which_independent_one_record)
     na_indices_indep<- is.na(data[[independent.var]])
     data[[independent.var]] <- as.character(data[[independent.var]])
     blank_indices <- (data[[independent.var]]=="")
     na_indices_2 <- (data[[independent.var]]=="NA")
     na_indices_3 <- (data[[independent.var]]=="<NA>")
-    problem_index <- blank_indices + na_indices_2 + na_indices_3 + which_independent_one_record
+    problem_index <- blank_indices + na_indices_2 + na_indices_3
     na_indices_indep[na_indices_indep == FALSE] <- problem_index[na_indices_indep == FALSE]
     na_indices = na_indices + na_indices_indep
   }
