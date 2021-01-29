@@ -508,7 +508,8 @@ mean_with_confints <- function(dependent.var,
 #'@export
 median_with_confints <- function(dependent.var,
                                  independent.var = NULL,
-                                 design) {
+                                 design,
+                                 confidence_level = 0.95) {
   if (!is.null(independent.var)) {
     warning(
       "confidence intervals calculated without disaggregation, but received data for an independent variable."
@@ -525,7 +526,7 @@ median_with_confints <- function(dependent.var,
 
   formula_string <- paste0("~as.numeric(", dependent.var, ")")
   summary <- svyquantile(formula(formula_string), design, quantiles=0.5,na.rm = T, ci=T)
-  #confints <- confint(summary, level = 0.95)
+  confints <- confint(summary, level = confidence_level)
   results <- data.frame(
     dependent.var = dependent.var,
     independent.var = "NA",
@@ -533,8 +534,8 @@ median_with_confints <- function(dependent.var,
     independent.var.value = "NA",
     numbers = summary$quantiles[1],
     se = attr(x = summary,which = "SE"),
-    min = summary$CIs[1],
-    max = summary$CIs[2]
+    min = confints[1],
+    max = confints[2]
   )
   return(results)
 }
@@ -548,7 +549,8 @@ median_with_confints <- function(dependent.var,
 #'@export
 sum_with_confints <- function(dependent.var,
                               independent.var = NULL,
-                              design) {
+                              design,
+                              confidence_level = 0.95) {
   if (!is.null(independent.var)) {
     warning(
       "confidence intervals calculated without disaggregation, but received data for an independent variable."
@@ -565,7 +567,7 @@ sum_with_confints <- function(dependent.var,
 
   formula_string <- paste0("~as.numeric(", dependent.var, ")")
   summary <- svytotal(formula(formula_string), design, na.rm = T)
-  confints <- confint(summary, level = 0.95)
+  confints <- confint(summary, level = confidence_level)
   results <- data.frame(
     dependent.var = dependent.var,
     independent.var = "NA",
@@ -648,7 +650,8 @@ mean_with_confints_groups <- function(dependent.var,
 #'@export
 median_with_confints_groups <- function(dependent.var,
                                         independent.var,
-                                        design) {
+                                        design,
+                                        confidence_level = 0.95) {
 
   sanitised <-datasanitation_design(design,dependent.var,independent.var,
                                     datasanitation_summary_statistics_mean_groups)
@@ -674,7 +677,7 @@ median_with_confints_groups <- function(dependent.var,
       ci = T,
       method = "constant"
     )
-  confints <-confint(result_svy_format, level = 0.95)
+  confints <-confint(result_svy_format, level = confidence_level)
 
   unique.independent.var.values <-
     design$variables[[independent.var]] %>% unique
@@ -708,7 +711,8 @@ median_with_confints_groups <- function(dependent.var,
 #'@export
 sum_with_confints_groups <- function(dependent.var,
                                      independent.var,
-                                     design) {
+                                     design,
+                                     confidence_level = 0.95) {
 
   sanitised <-datasanitation_design(design,dependent.var,independent.var,
                                     datasanitation_summary_statistics_mean_groups)
@@ -731,7 +735,7 @@ sum_with_confints_groups <- function(dependent.var,
       svytotal,
       na.rm = T
     )
-  confints <-confint(result_svy_format, level = 0.95)
+  confints <-confint(result_svy_format, level = confidence_level)
 
   unique.independent.var.values <-
     design$variables[[independent.var]] %>% unique

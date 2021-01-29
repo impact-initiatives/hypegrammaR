@@ -50,7 +50,8 @@ map_to_summary_statistic <-
             dependent.var.sm.cols =
               dependent.var.sm.cols,
             independent.var = independent.var,
-            design = design
+            design = design,
+            confidence_level = confidence_level
           )
       }
       if (!dependent_is_select_multiple) {
@@ -58,7 +59,8 @@ map_to_summary_statistic <-
           percent_with_confints_select_one_groups(
             dependent.var = dependent.var,
             independent.var = independent.var,
-            design = design
+            design = design,
+            confidence_level = confidence_level
           )
 
 
@@ -80,7 +82,8 @@ map_to_summary_statistic <-
         median_with_confints_groups(
           dependent.var = dependent.var,
           independent.var = independent.var,
-          design = design
+          design = design,
+          confidence_level = confidence_level
         )
     }
 
@@ -89,7 +92,8 @@ map_to_summary_statistic <-
         sum_with_confints_groups(
           dependent.var = dependent.var,
           independent.var = independent.var,
-          design = design
+          design = design,
+          confidence_level = confidence_level
         )
     }
 
@@ -118,14 +122,16 @@ map_to_summary_statistic <-
     if (case == "CASE_direct_reporting_median_numerical_") {
       summary_stat <- median_with_confints(
         dependent.var = dependent.var,
-        design = design
+        design = design,
+        confidence_level = confidence_level
       )
     }
 
     if (case == "CASE_direct_reporting_sum_numerical_") {
       summary_stat <- sum_with_confints(
         dependent.var = dependent.var,
-        design = design
+        design = design,
+        confidence_level = confidence_level
       )
     }
 
