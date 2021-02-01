@@ -524,9 +524,10 @@ median_with_confints <- function(dependent.var,
 
   design<-sanitised$design
 
+  alpha = 1-confidence_level
   formula_string <- paste0("~as.numeric(", dependent.var, ")")
-  summary <- svyquantile(formula(formula_string), design, quantiles=0.5,na.rm = T, ci=T)
-  confints <- confint(summary, level = confidence_level)
+  summary <- svyquantile(formula(formula_string), design, quantiles=0.5,na.rm = T, ci=T, alpha=alpha)
+  confints <- confint(summary)
   results <- data.frame(
     dependent.var = dependent.var,
     independent.var = "NA",
@@ -534,8 +535,8 @@ median_with_confints <- function(dependent.var,
     independent.var.value = "NA",
     numbers = summary$quantiles[1],
     se = attr(x = summary,which = "SE"),
-    min = confints[1],
-    max = confints[2]
+    min = confints[,1],
+    max = confints[,2]
   )
   return(results)
 }
