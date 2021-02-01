@@ -575,7 +575,7 @@ sum_with_confints <- function(dependent.var,
     dependent.var.value = "NA",
     independent.var.value = "NA",
     numbers = summary[1],
-    #se = attr(x = summary,which = "SE"),
+    se = NA,
     min = confints[1],
     max = confints[2]
   )
