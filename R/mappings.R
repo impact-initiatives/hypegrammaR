@@ -117,7 +117,7 @@ map_to_master_table <- function(results_object, filename, questionnaire = NULL, 
           x$hypothesis.test$name <- NA
         }
         if(!is.null(x$summary.statistic)){
-        y <- as.data.frame(x$summary.statistic,
+        y <- data.frame(x$summary.statistic,
              p.value = x$hypothesis.test$result$p.value,
              test.name = x$hypothesis.test$name)
         }

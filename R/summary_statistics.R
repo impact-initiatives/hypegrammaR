@@ -499,6 +499,89 @@ mean_with_confints <- function(dependent.var,
   return(results)
 }
 
+#'Weighted medians with confidence intervals
+#'@param dependent.var string with the column name in `data` of the dependent variable. Should be a numerical variable.
+#'@param independent.var should be null ! For other functions: string with the column name in `data` of the independent variable
+#'@param design the svy design object created using map_to_design or directly with svydesign
+#'@details This function takes the design object and the name of your dependent variable when the latter is a numerical. It calculates the weighted median for your variable.
+#'@return A table in long format of the results, with the column names dependent.var, dependent.var.value (=NA), independent.var (= NA), independent.var.value (= NA), numbers (= median), se, min and max.
+#'@export
+median_with_confints <- function(dependent.var,
+                                 independent.var = NULL,
+                                 design,
+                                 confidence_level = 0.95) {
+  if (!is.null(independent.var)) {
+    warning(
+      "confidence intervals calculated without disaggregation, but received data for an independent variable."
+    )
+  }
+
+  sanitised<-datasanitation_design(design,dependent.var,independent.var = NULL,
+                                   datasanitation_summary_statistics_mean)
+  if(!sanitised$success){
+    warning(sanitised$message)
+    return(datasanitation_return_empty_table(design$variables, dependent.var))}
+
+  design<-sanitised$design
+
+  alpha = 1-confidence_level
+  formula_string <- paste0("~as.numeric(", dependent.var, ")")
+  summary <- svyquantile(formula(formula_string), design, quantiles=0.5,na.rm = T, ci=T, alpha=alpha)
+  confints <- confint(summary)
+  results <- data.frame(
+    dependent.var = dependent.var,
+    independent.var = "NA",
+    dependent.var.value = "NA",
+    independent.var.value = "NA",
+    numbers = summary$quantiles[1],
+    se = attr(x = summary,which = "SE"),
+    min = confints[,1],
+    max = confints[,2]
+  )
+  return(results)
+}
+
+#'Weighted sum with confidence intervals
+#'@param dependent.var string with the column name in `data` of the dependent variable. Should be a numerical variable.
+#'@param independent.var should be null ! For other functions: string with the column name in `data` of the independent variable
+#'@param design the svy design object created using map_to_design or directly with svydesign
+#'@details This function takes the design object and the name of your dependent variable when the latter is a numerical. It calculates the weighted median for your variable.
+#'@return A table in long format of the results, with the column names dependent.var, dependent.var.value (=NA), independent.var (= NA), independent.var.value (= NA), numbers (= sum), se (= NA), min and max.
+#'@export
+sum_with_confints <- function(dependent.var,
+                              independent.var = NULL,
+                              design,
+                              confidence_level = 0.95) {
+  if (!is.null(independent.var)) {
+    warning(
+      "confidence intervals calculated without disaggregation, but received data for an independent variable."
+    )
+  }
+
+  sanitised<-datasanitation_design(design,dependent.var,independent.var = NULL,
+                                   datasanitation_summary_statistics_mean)
+  if(!sanitised$success){
+    warning(sanitised$message)
+    return(datasanitation_return_empty_table(design$variables, dependent.var))}
+
+  design<-sanitised$design
+
+  formula_string <- paste0("~as.numeric(", dependent.var, ")")
+  summary <- svytotal(formula(formula_string), design, na.rm = T)
+  confints <- confint(summary, level = confidence_level)
+  results <- data.frame(
+    dependent.var = dependent.var,
+    independent.var = "NA",
+    dependent.var.value = "NA",
+    independent.var.value = "NA",
+    numbers = summary[1],
+    se = NA,
+    min = confints[1],
+    max = confints[2]
+  )
+  return(results)
+}
+
 #'Weighted means with confidence intervals for groups
 #'@param dependent.var string with the column name in `data` of the dependent variable. Should be a numerical variable.
 #'@param independent.var string with the column name in `data` of the independent (group) variable. Should be a 'select one'
@@ -557,6 +640,125 @@ mean_with_confints_groups <- function(dependent.var,
 
     return(results)
   }
+}
+
+#'Weighted medians with confidence intervals for groups
+#'@param dependent.var string with the column name in `data` of the dependent variable. Should be a numerical variable.
+#'@param independent.var string with the column name in `data` of the independent (group) variable. Should be a 'select one'
+#'@param design the svy design object created using map_to_design or directly with svydesign
+#'@details This function takes the design object and the name of your dependent variable when the latter is a numerical. It calculates the weighted median for your variable.
+#'@return A table in long format of the results, with the column names dependent.var, dependent.var.value (=NA), independent.var, independent.var.value, numbers (= median), se, min and max.
+#'@export
+median_with_confints_groups <- function(dependent.var,
+                                        independent.var,
+                                        design,
+                                        confidence_level = 0.95) {
+
+  sanitised <-datasanitation_design(design,dependent.var,independent.var,
+                                    datasanitation_summary_statistics_mean_groups)
+  if(!sanitised$success){
+    warning(sanitised$message)
+    return(hypegrammaR:::datasanitation_return_empty_table_NA(design$variables, dependent.var, independent.var))}
+
+  design<-sanitised$design
+
+  formula_string <- paste0("~as.numeric(", dependent.var, ")")
+  by <- paste0("~", independent.var, sep = "")
+
+  #design <- subset(design, !design$variables[,dependent.var] %in% c(NA,""," "))
+
+  result_svy_format <-
+    svyby(
+      formula(formula_string),
+      formula(by),
+      design,
+      svyquantile,
+      na.rm = T,
+      quantiles=0.5,
+      ci = T,
+      method = "constant"
+    )
+  confints <-confint(result_svy_format, level = confidence_level)
+
+  unique.independent.var.values <-
+    design$variables[[independent.var]] %>% unique
+  results <- unique.independent.var.values %>%
+    lapply(function(x) {
+      dependent_value_x_stats <- result_svy_format[as.character(x), ]
+      dependent_value_x_ci <- confints[as.character(x), ]
+      colnames(dependent_value_x_stats) <- c("independent.var.value", "numbers", "se")
+      names(dependent_value_x_ci) <- c("min", "max")
+      data.frame(
+        dependent.var = dependent.var,
+        independent.var = independent.var,
+        dependent.var.value = NA,
+        independent.var.value = x,
+        numbers = dependent_value_x_stats[2],
+        se = dependent_value_x_stats[3],
+        min = dependent_value_x_ci[1],
+        max = dependent_value_x_ci[2]
+      )
+    }) %>% do.call(rbind, .)
+
+  return(results)
+}
+
+#'Weighted sum with confidence intervals for groups
+#'@param dependent.var string with the column name in `data` of the dependent variable. Should be a numerical variable.
+#'@param independent.var string with the column name in `data` of the independent (group) variable. Should be a 'select one'
+#'@param design the svy design object created using map_to_design or directly with svydesign
+#'@details This function takes the design object and the name of your dependent variable when the latter is a numerical. It calculates the weighted median for your variable.
+#'@return A table in long format of the results, with the column names dependent.var, dependent.var.value (=NA), independent.var, independent.var.value, numbers (= sums), se, min and max.
+#'@export
+sum_with_confints_groups <- function(dependent.var,
+                                     independent.var,
+                                     design,
+                                     confidence_level = 0.95) {
+
+  sanitised <-datasanitation_design(design,dependent.var,independent.var,
+                                    datasanitation_summary_statistics_mean_groups)
+  if(!sanitised$success){
+    warning(sanitised$message)
+    return(hypegrammaR:::datasanitation_return_empty_table_NA(design$variables, dependent.var, independent.var))}
+
+  design<-sanitised$design
+
+  formula_string <- paste0("~as.numeric(", dependent.var, ")")
+  by <- paste0("~", independent.var, sep = "")
+
+  #design <- subset(design, !design$variables[,dependent.var] %in% c(NA,""," "))
+
+  result_svy_format <-
+    svyby(
+      formula(formula_string),
+      formula(by),
+      design,
+      svytotal,
+      na.rm = T
+    )
+  confints <-confint(result_svy_format, level = confidence_level)
+
+  unique.independent.var.values <-
+    design$variables[[independent.var]] %>% unique
+  results <- unique.independent.var.values %>%
+    lapply(function(x) {
+      dependent_value_x_stats <- result_svy_format[as.character(x), ]
+      dependent_value_x_ci <- confints[as.character(x), ]
+      colnames(dependent_value_x_stats) <- c("independent.var.value", "numbers", "se")
+      names(dependent_value_x_ci) <- c("min", "max")
+      data.frame(
+        dependent.var = dependent.var,
+        independent.var = independent.var,
+        dependent.var.value = NA,
+        independent.var.value = x,
+        numbers = dependent_value_x_stats[2],
+        se = dependent_value_x_stats[3],
+        min = dependent_value_x_ci[1],
+        max = dependent_value_x_ci[2]
+      )
+    }) %>% do.call(rbind, .)
+
+  return(results)
 }
 
 #'Weighted means with confidence intervals for groups

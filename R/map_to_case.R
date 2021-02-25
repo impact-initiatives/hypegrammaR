@@ -3,7 +3,7 @@
 list_all_cases<-function(implemented_only=F){
 
   if(!implemented_only){
-    hypothesis_types<-c("direct_reporting","group_difference","limit","correlation","change")
+    hypothesis_types<-c("direct_reporting", "direct_reporting_median", "direct_reporting_sum", "group_difference", "group_difference_median", "group_difference_sum", "limit","correlation","change")
     dependent.var.types<-c("numerical","categorical")
     independent.var.types<-c("numerical","categorical")
     valid_cases<- apply(expand.grid("CASE",hypothesis_types, dependent.var.types,independent.var.types), 1, paste, collapse="_")
@@ -13,7 +13,11 @@ list_all_cases<-function(implemented_only=F){
   return(c(
     "CASE_group_difference_categorical_categorical",
     "CASE_group_difference_numerical_categorical",
+    "CASE_group_difference_median_numerical_categorical",
+    "CASE_group_difference_sum_numerical_categorical",
     "CASE_direct_reporting_numerical_",
+    "CASE_direct_reporting_median_numerical_",
+    "CASE_direct_reporting_sum_numerical_",
     "CASE_direct_reporting_categorical_",
     "CASE_direct_reporting_categorical_categorical",
     "CASE_direct_reporting_numerical_categorical",
@@ -61,7 +65,7 @@ map_to_case<-function(hypothesis.type,
     stop(  "dependent.var.type must be either 'categorical', 'numerical' or left empty (guessing from data)")
   }
 
-  if(hypothesis.type!="direct_reporting" & is.null(independent.var.type)){
+  if((hypothesis.type!="direct_reporting" & hypothesis.type!="direct_reporting_median" & hypothesis.type!="direct_reporting_sum") & is.null(independent.var.type)){
     stop("if hypothesis type is not 'direct_reporting, the independent.var.type must be provided (and not be NULL)'")
   }
 
