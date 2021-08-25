@@ -31,12 +31,12 @@ Imports:
     purrr,
     scales
 Remotes:
-    github::mabafaba/koboquest,
-    github::mabafaba/xlsformfill,
-    github::mabafaba/kobostandards,
-    github::mabafaba/composr,
-    github::mabafaba/surveyweights,
-    github::mabafaba/koboquest
+    github::impact-initiatives/koboquest,
+    github::impact-initiatives/xlsformfill,
+    github::impact-initiatives/kobostandards,
+    github::impact-initiatives/composr,
+    github::impact-initiatives/surveyweights,
+    github::impact-initiatives/koboquest
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
