@@ -34,6 +34,7 @@ analysisplan_expand_repeat <- function(analysisplan, data) {
     }
     analysisplan.repeat <-
       analysisplan[!(analysisplan$repeat.var %in% c(NA, "", " ")), ]
+    if (!nrow(analysisplan.repeat) < 1) {
     analysisplan.repeat <-
       (1:nrow(analysisplan.repeat)) %>% lapply(function(ap_row_index) {
         ap_row <- analysisplan.repeat[ap_row_index, ] %>% unlist
@@ -49,6 +50,7 @@ analysisplan_expand_repeat <- function(analysisplan, data) {
           unique(as.character(data[[ap_row["repeat.var"]]]))
         ap_row_expanded
       }) %>% do.call(rbind, .)
+    }
 
     # analysisplan.repeat <- lapply(repeat.var, function(x){
     #   if(!x %in% c(NA, "", " ")){

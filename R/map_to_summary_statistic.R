@@ -50,7 +50,8 @@ map_to_summary_statistic <-
             dependent.var.sm.cols =
               dependent.var.sm.cols,
             independent.var = independent.var,
-            design = design
+            design = design,
+            confidence_level = confidence_level
           )
       }
       if (!dependent_is_select_multiple) {
@@ -58,7 +59,8 @@ map_to_summary_statistic <-
           percent_with_confints_select_one_groups(
             dependent.var = dependent.var,
             independent.var = independent.var,
-            design = design
+            design = design,
+            confidence_level = confidence_level
           )
 
 
@@ -68,6 +70,26 @@ map_to_summary_statistic <-
     if (case == "CASE_group_difference_numerical_categorical") {
       summary_stat <-
         mean_with_confints_groups(
+          dependent.var = dependent.var,
+          independent.var = independent.var,
+          design = design,
+          confidence_level = confidence_level
+        )
+    }
+
+    if (case == "CASE_group_difference_median_numerical_categorical") {
+      summary_stat <-
+        median_with_confints_groups(
+          dependent.var = dependent.var,
+          independent.var = independent.var,
+          design = design,
+          confidence_level = confidence_level
+        )
+    }
+
+    if (case == "CASE_group_difference_sum_numerical_categorical") {
+      summary_stat <-
+        sum_with_confints_groups(
           dependent.var = dependent.var,
           independent.var = independent.var,
           design = design,
@@ -95,7 +117,23 @@ map_to_summary_statistic <-
             confidence_level = confidence_level
           )
       }
-      }
+    }
+
+    if (case == "CASE_direct_reporting_median_numerical_") {
+      summary_stat <- median_with_confints(
+        dependent.var = dependent.var,
+        design = design,
+        confidence_level = confidence_level
+      )
+    }
+
+    if (case == "CASE_direct_reporting_sum_numerical_") {
+      summary_stat <- sum_with_confints(
+        dependent.var = dependent.var,
+        design = design,
+        confidence_level = confidence_level
+      )
+    }
 
     if (case == "CASE_direct_reporting_numerical_") {
       summary_stat <- mean_with_confints(
